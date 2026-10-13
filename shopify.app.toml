@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "a596adb1f8fd3a9af5ac2a580cc68e21"
-application_url = "https://example.com"
+application_url = "https://trust-badges-bar.vercel.app"
 embedded = true
 name = "trust-badges-bar"
 
@@ -25,8 +25,7 @@ api_version = "2026-10"
   uri = "/webhooks/compliance"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://trust-badges-bar.vercel.app/auth/callback" ]
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = true
