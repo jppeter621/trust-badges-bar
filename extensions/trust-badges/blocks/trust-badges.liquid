@@ -1,0 +1,64 @@
+<div
+  id="trust-badges-{{ block.id }}"
+  class="trust-badges-bar"
+  style="--bg-color: {{ block.settings.bg_color }}; --text-color: {{ block.settings.text_color }};"
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.badge_1 != blank %}
+    <span class="trust-badges-bar__item">{{ block.settings.badge_1 }}</span>
+  {% endif %}
+  {% if block.settings.badge_2 != blank %}
+    <span class="trust-badges-bar__item">{{ block.settings.badge_2 }}</span>
+  {% endif %}
+  {% if block.settings.badge_3 != blank %}
+    <span class="trust-badges-bar__item">{{ block.settings.badge_3 }}</span>
+  {% endif %}
+</div>
+
+<style>
+  .trust-badges-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 10px 16px;
+    background: var(--bg-color, #1a1a1a);
+    color: var(--text-color, #ffffff);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+  }
+</style>
+
+<script>
+  (function () {
+    var bar = document.getElementById("trust-badges-{{ block.id }}");
+    if (!bar) return;
+    function adjust() {
+      document.body.style.paddingTop = bar.offsetHeight + "px";
+    }
+    adjust();
+    window.addEventListener("resize", adjust);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Trust Badges Bar",
+  "target": "body",
+  "settings": [
+    { "type": "text", "id": "badge_1", "label": "Badge 1", "default": "Secure Checkout" },
+    { "type": "text", "id": "badge_2", "label": "Badge 2", "default": "Free Shipping" },
+    { "type": "text", "id": "badge_3", "label": "Badge 3", "default": "30-Day Returns" },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#1a1a1a" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" }
+  ]
+}
+{% endschema %}
