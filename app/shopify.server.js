@@ -19,6 +19,7 @@ const shopify = shopifyApp({
   distribution: AppDistribution.AppStore,
   billing: {
     monthlyPlan: {
+      trialDays: 3,
       lineItems: [
         {
           amount: 3.99,

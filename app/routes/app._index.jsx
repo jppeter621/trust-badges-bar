@@ -1,28 +1,33 @@
+/* global process */
 import { useEffect } from "react";
 import { useFetcher, useLoaderData } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  const { billing } = await authenticate.admin(request);
+  const { billing, session } = await authenticate.admin(request);
+  const isTest = process.env.NODE_ENV !== "production";
 
   const billingCheck = await billing.check({
     plans: ["monthlyPlan"],
-    isTest: true,
+    isTest,
   });
 
-  return { hasActivePayment: billingCheck.hasActivePayment };
+  return {
+    hasActivePayment: billingCheck.hasActivePayment,
+    shop: session.shop,
+    apiKey: process.env.SHOPIFY_API_KEY || "",
+  };
 };
 
 export const action = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
+  const isTest = process.env.NODE_ENV !== "production";
 
   try {
     return await billing.request({
       plan: "monthlyPlan",
-      isTest: true,
-      trialDays: 3,
+      isTest,
     });
   } catch (error) {
     console.error("BILLING ERROR:", JSON.stringify(error, null, 2));
@@ -31,9 +36,8 @@ export const action = async ({ request }) => {
 };
 
 export default function Index() {
-  const { hasActivePayment } = useLoaderData();
+  const { hasActivePayment, shop, apiKey } = useLoaderData();
   const fetcher = useFetcher();
-  const shopify = useAppBridge();
   const isLoading = fetcher.state !== "idle";
 
   const subscribe = () => fetcher.submit({}, { method: "POST" });
@@ -43,6 +47,8 @@ export default function Index() {
       open(fetcher.data.confirmationUrl, "_top");
     }
   }, [fetcher.data]);
+
+  const themeEditorUrl = `https://${shop}/admin/themes/current/editor?context=apps&activateAppId=${apiKey}/trust-badges-bar`;
 
   if (!hasActivePayment) {
     return (
@@ -68,18 +74,29 @@ export default function Index() {
     <s-page heading="Trust Badges Bar">
       <s-section heading="You're all set!">
         <s-paragraph>
-          Your subscription is active. To show the trust badges on your
-          storefront:
+          Your subscription is active. Follow these steps to show the trust
+          badges bar at the top of your storefront:
         </s-paragraph>
-        <s-unordered-list>
-          <s-list-item>Go to Online Store - Themes - Customize</s-list-item>
+        <s-ordered-list>
           <s-list-item>
-            Click Add section and choose Trust Badges Bar
+            Click the button below to open the theme editor with App embeds.
           </s-list-item>
+          <s-list-item>Turn on the Trust Badges Bar toggle.</s-list-item>
           <s-list-item>
-            Toggle the badges you want and pick your colors, then click Save
+            Edit the badge text and colors, then click Save.
           </s-list-item>
-        </s-unordered-list>
+        </s-ordered-list>
+        <s-button variant="primary" href={themeEditorUrl} target="_blank">
+          Open theme editor
+        </s-button>
+      </s-section>
+
+      <s-section heading="Need help?">
+        <s-paragraph>
+          If the bar does not appear after you save, open Online Store -
+          Themes - Customize, click the App embeds icon on the left, and make
+          sure Trust Badges Bar is switched on.
+        </s-paragraph>
       </s-section>
     </s-page>
   );
