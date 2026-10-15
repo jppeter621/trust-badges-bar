@@ -6,7 +6,9 @@ import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   const { billing, session } = await authenticate.admin(request);
-  const isTest = process.env.NODE_ENV !== "production";
+  const isTest =
+  process.env.BILLING_IS_TEST === "true" ||
+  process.env.NODE_ENV !== "production";
 
   const billingCheck = await billing.check({
     plans: ["monthlyPlan"],
@@ -22,7 +24,9 @@ export const loader = async ({ request }) => {
 
 export const action = async ({ request }) => {
   const { billing } = await authenticate.admin(request);
-  const isTest = process.env.NODE_ENV !== "production";
+  const isTest =
+  process.env.BILLING_IS_TEST === "true" ||
+  process.env.NODE_ENV !== "production";
 
   try {
     return await billing.request({
