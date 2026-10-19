@@ -1,0 +1,102 @@
+{% comment %}
+  Trust Badges - app block (place it anywhere with the theme editor)
+{% endcomment %}
+
+{%- assign icon_h = block.settings.icon_size -%}
+{%- assign icon_w = icon_h | times: 1.58 | round -%}
+
+{%- case block.settings.align -%}
+  {%- when 'left' -%}{%- assign justify = 'flex-start' -%}
+  {%- when 'right' -%}{%- assign justify = 'flex-end' -%}
+  {%- else -%}{%- assign justify = 'center' -%}
+{%- endcase -%}
+
+{%- if block.settings.payment_types != blank -%}
+  {%- assign types = block.settings.payment_types | remove: ' ' | downcase | split: ',' -%}
+{%- else -%}
+  {%- assign types = shop.enabled_payment_types -%}
+{%- endif -%}
+
+<div id="tbb-{{ block.id }}" class="tbb" {{ block.shopify_attributes }}>
+  {%- if block.settings.heading != blank -%}
+    <p class="tbb__heading">{{ block.settings.heading | escape }}</p>
+  {%- endif -%}
+
+  {%- if block.settings.show_payment_icons -%}
+    <ul class="tbb__list" role="list">
+      {%- for type in types -%}
+        <li class="tbb__item">{{ type | payment_type_svg_tag: class: 'tbb__icon' }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</div>
+
+<style>
+  #tbb-{{ block.id }} {
+    box-sizing: border-box;
+    margin: 12px 0;
+    text-align: {{ block.settings.align }};
+    color: {{ block.settings.text_color }};
+    {{ block.settings.custom_css | strip_html }}
+  }
+  #tbb-{{ block.id }} .tbb__heading {
+    margin: 0 0 10px;
+    font-size: {{ block.settings.text_size }}px;
+    font-weight: 600;
+  }
+  #tbb-{{ block.id }} .tbb__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: {{ justify }};
+    gap: 8px;
+  }
+  #tbb-{{ block.id }} .tbb__item {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+  }
+  #tbb-{{ block.id }} .tbb__icon {
+    height: {{ icon_h }}px;
+    width: {{ icon_w }}px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Trust Badges",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Safe & secure checkout" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+    {
+      "type": "text",
+      "id": "payment_types",
+      "label": "Payment icons to show (optional)",
+      "info": "Leave empty to use the payment methods enabled in your store. Or type names separated by commas, in the order you want, e.g. visa, master, paypal"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    { "type": "range", "id": "icon_size", "label": "Icon height", "min": 20, "max": 60, "step": 2, "unit": "px", "default": 28 },
+    { "type": "range", "id": "text_size", "label": "Heading size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 16 },
+    { "type": "color", "id": "text_color", "label": "Heading color", "default": "#1a1a1a" },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS (optional)",
+      "info": "Style rules for the whole block, e.g. background-color: #e9f5c0; padding: 16px; border-radius: 20px;"
+    }
+  ]
+}
+{% endschema %}
