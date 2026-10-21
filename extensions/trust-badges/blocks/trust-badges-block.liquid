@@ -1,5 +1,6 @@
 {% comment %}
   Trust Badges - app block (place it anywhere with the theme editor)
+  Location: extensions/<your-extension>/blocks/trust-badges-block.liquid
 {% endcomment %}
 
 {%- assign icon_h = block.settings.icon_size -%}
@@ -23,11 +24,15 @@
   {%- endif -%}
 
   {%- if block.settings.show_payment_icons -%}
-    <ul class="tbb__list" role="list">
-      {%- for type in types -%}
-        <li class="tbb__item">{{ type | payment_type_svg_tag: class: 'tbb__icon' }}</li>
-      {%- endfor -%}
-    </ul>
+    {%- if types.size > 0 -%}
+      <ul class="tbb__list" role="list">
+        {%- for type in types -%}
+          <li class="tbb__item">{{ type | payment_type_svg_tag: class: 'tbb__icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- elsif request.design_mode -%}
+      <p class="tbb__hint">No payment methods found in this store. Type icon names in the block settings, for example: visa, master, paypal</p>
+    {%- endif -%}
   {%- endif -%}
 </div>
 
@@ -43,6 +48,11 @@
     margin: 0 0 10px;
     font-size: {{ block.settings.text_size }}px;
     font-weight: 600;
+  }
+  #tbb-{{ block.id }} .tbb__hint {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.7;
   }
   #tbb-{{ block.id }} .tbb__list {
     list-style: none;
