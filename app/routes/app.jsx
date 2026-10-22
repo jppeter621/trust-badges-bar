@@ -1,4 +1,4 @@
-   /* global process */
+/* global process */
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
@@ -6,15 +6,30 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  const { billing } = await authenticate.admin(request);
+  const { billing, admin } = await authenticate.admin(request);
+
+  // Development stores can't pay real charges, so use test charges there.
+  // Real merchant stores are not development stores, so they are billed normally.
+  const response = await admin.graphql(
+    `#graphql
+    query ShopPlan {
+      shop {
+        plan {
+          partnerDevelopment
+        }
+      }
+    }`
+  );
+  const json = await response.json();
+  const isTest = json?.data?.shop?.plan?.partnerDevelopment === true;
 
   await billing.require({
     plans: ["monthlyPlan"],
-    isTest: process.env.NODE_ENV !== "production",
+    isTest,
     onFailure: async () =>
       billing.request({
         plan: "monthlyPlan",
-        isTest: process.env.NODE_ENV !== "production",
+        isTest,
       }),
   });
 
