@@ -59,7 +59,7 @@ export default function Index() {
       <s-page heading="Trust Badges Bar">
         <s-section heading="Subscribe to activate trust badges">
           <s-paragraph>
-            Start your 3-day free trial for $3.99/month. Add trust-boosting
+            Start your 5-day free trial for $3.99/month. Add trust-boosting
             badges to your storefront in minutes - no coding required.
           </s-paragraph>
           <s-button
